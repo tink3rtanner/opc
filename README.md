@@ -15,9 +15,9 @@ python driven ui on display, list-style menus, button interaction (L R U D 1 2 3
 
 
 Features
-- ssh106 64x128
+- ssh106 64x128 menu UI
 - Tape backup
-- Tape load (buggy, forces refrag)
+- Tape load (buggy, forces defrag)
 - Sample pack load/delete
 
 
