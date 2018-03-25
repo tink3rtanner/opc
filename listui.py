@@ -6,6 +6,46 @@ import RPi.GPIO as GPIO
 import shutil as sh
 from subprocess import *
 
+#GLOBALS
+
+#KEYS
+key={}
+key['key1']=5 #broken on menona
+key['key2']=20
+key['key3']=16
+
+key['left']=5 
+key['up']=6
+key['press']=13
+key['down']=19
+key['right']=26
+
+#LIST OF SAMPLE PACKS AND PATHS
+sampleList=[
+		["_josh","/home/pi/Desktop/samplepacks/josh/"],
+		["courtyard","/home/pi/Desktop/samplepacks/courtyard/"],
+		["dawless","/home/pi/Desktop/samplepacks/dawless/"],
+		["C-MIX","/home/pi/Desktop/samplepacks/C-MIX/"],
+		["inkd","/home/pi/Desktop/samplepacks/op1_3.2/inkdd/"],
+		["Dark Energy","/home/pi/Desktop/samplepacks/op1_3.2/Dark Energy/"],
+		["memories","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/memories/"],
+		["opines","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/opines/"]
+
+		]
+#List of tapes an paths
+tapeList=[
+		["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
+		["recycling bin v2","/home/pi/Desktop/tapes/recycling bin v2"],
+		["fun with sequencers","/home/pi/Desktop/op1-tapebackups/fun with sequencers"],
+		["lofi family","/home/pi/Desktop/op1-tapebackups/lofi family"],
+		["primarily pentatonic","/home/pi/Desktop/op1-tapebackups/primarily pentatonic"],
+		["2018-02-24","/home/pi/Desktop/op1-tapebackups/2018-02-24"],
+		["lets start with guitar","/home/pi/Desktop/op1-tapebackups/lets start with guitar this time"],
+		["spaceman","/home/pi/Desktop/op1-tapebackups/2018-03-25"],
+
+		]
+
+
 def init():
 
 	serial = spi(device=0, port=0)
@@ -22,17 +62,7 @@ def initgpio():
 	print "Initializing GPIO"
 	#Initialize GPIO
 	GPIO.setmode(GPIO.BCM)
-	key={}
-
-	#key['key1']=21 #broken on menona
-	key['key2']=20
-	key['key3']=16
-
-	key['left']=5 
-	key['up']=6
-	key['press']=13
-	key['down']=19
-	key['right']=26
+	
 
 	#GPIO.setup(key['key1'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 	GPIO.setup(key['key2'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -111,19 +141,19 @@ def listMenu(device,mlist,alist,mname,draw=0):
 	title=mname
 	#initial settings
 	#keys={}
-	key={}
+	# key={}
 	pos=1
 	apos=0
 
-	key['key1']=5 #should be 21, only cuz key1 is broken on menona
-	key['key2']=20
-	key['key3']=16
+	# key['key1']=5 #should be 21, only cuz key1 is broken on menona
+	# key['key2']=20
+	# key['key3']=16
 
-	key['left']=5 
-	key['up']=6
-	key['press']=13
-	key['down']=19
-	key['right']=26
+	# key['left']=5 
+	# key['up']=6
+	# key['press']=13
+	# key['down']=19
+	# key['right']=26
 	#GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
 
 
@@ -391,63 +421,21 @@ def actionhandler(device,pos,apos,mname,draw=0):
 
 			return(1)
 	elif mname=="MAIN>TAPES":
-		print "tape actions @POS: ",pos,", apos: ",apos
-		if pos==1 and apos==1:
-			loadTape(device,"/home/pi/Desktop/tapes/recycling bin v1/tape")
-		elif pos==2 and apos==1:
-			loadTape(device,"/home/pi/Desktop/tapes/recycling bin v2")
-		elif pos==3 and apos==1:
-			loadTape(device,"/home/pi/Desktop/op1-tapebackups/primarily pentatonic")
-		elif pos==4 and apos==1:
-			loadTape(device,"/home/pi/Desktop/op1-tapebackups/2018-02-24")
-		elif pos==5 and apos==1:
-			loadTape(device,"/home/pi/Desktop/op1-tapebackups/lets start with guitar this time")
-		elif pos==6 and apos==1:
-			loadTape(device,"/home/pi/Desktop/op1-tapebackups/2018-03-25")
+		print "tape actions @POS: ",pos,", apos: ",apos	
+
+		if apos==1: #assuming pos is valid becasue menuList was built from tapeList
+			loadTape(device,tapeList[pos-1][1])
 
 	elif mname=="MAIN>SAMPLES":	
-		# 	mlist=["josh", "courtyard","dawless","cmix","more"]
-		# 	alist=["load", "unload","[empty]"]
-
-		sampleList=[
-		["_josh","/home/pi/Desktop/samplepacks/josh/"],
-		["courtyard","/home/pi/Desktop/samplepacks/courtyard/"],
-		["dawless","/home/pi/Desktop/samplepacks/dawless/"],
-		["C-MIX","/home/pi/Desktop/samplepacks/C-MIX/"],
-		["inkd","/home/pi/Desktop/samplepacks/op1_3.2/inkdd/"],
-		["Dark Energy","/home/pi/Desktop/samplepacks/op1_3.2/Dark Energy/"],
-		["memories","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/memories/"],
-		["opines","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/opines/"]
-
-
-		]
 
 		print "sample actions",pos
-		if pos==1 or 2 or 3 or 4 or 5 or 6 or 7:
-			spath="/home/pi/Desktop/samplepacks/josh/"
-			spath=sampleList[pos-1][1]
-			if apos==1:
-				loadUnloadSample(device,spath,sampleList[pos-1][0],"load")
-			elif apos==2:
-				loadUnloadSample(device,spath,sampleList[pos-1][0],"delete")
-		# elif pos==2:
-		# 	spath="/home/pi/Desktop/samplepacks/courtyard/"
-		# 	if apos==1:
-		# 		loadUnloadSample(device,spath,"courtyard","load")
-		# 	elif apos==2:
-		# 		loadUnloadSample(device,spath,"courtyard","delete")
-		# elif pos==3:
-		# 	spath="/home/pi/Desktop/samplepacks/dawless/"
-		# 	if apos==1:
-		# 		loadUnloadSample(device,spath,"dawless","load")
-		# 	elif apos==2:
-		# 		loadUnloadSample(device,spath,"dawless","delete")
-		# elif pos==4:
-		# 	spath="/home/pi/Desktop/samplepacks/C-MIX/"
-		# 	if apos==1:
-		# 		loadUnloadSample(device,spath,"C-MIX","load")
-		# 	elif apos==2:
-		# 		loadUnloadSample(device,spath,"C_MIX","delete")
+		#if pos==1 or 2 or 3 or 4 or 5 or 6 or 7: 
+		#assuming pos is valid bc was built from sampleList
+		spath=sampleList[pos-1][1]
+		if apos==1:
+			loadUnloadSample(device,spath,sampleList[pos-1][0],"load")
+		elif apos==2:
+			loadUnloadSample(device,spath,sampleList[pos-1][0],"delete")
 
 	elif mname=="MAIN>MIDI":
 		print "midi actions"
@@ -482,13 +470,20 @@ def actionhandler(device,pos,apos,mname,draw=0):
 	return(0)
 
 def tapeMenu(device):
-	mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
+	mlist=[]
+	for item in tapeList: #build menu list from tapeList global
+		mlist.append(item[0])
+	#mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
 	alist=["load", "[empty]","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>TAPES")
 
 
 def sampleMenu(device):
-	mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
+	#mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
+	mlist=[]
+	for item in sampleList: #build menu list from sampleList global
+		mlist.append(item[0])
+
 	alist=["load", "unload","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>SAMPLES")	
 
