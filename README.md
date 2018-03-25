@@ -17,12 +17,13 @@ python driven ui on display, list-style menus, button interaction (L R U D 1 2 3
 Features
 - ssh106 64x128 menu UI
 - Tape backup
-- Tape load (buggy, forces defrag)
+- Tape load
 - Sample pack load/delete
 
 
 Future Features
 - 'scene' load (samples, tape, and presets all at once)
+- updates tape
 - aiff parser
 - count file capacity of op1 sampler/drum
 - auto-list directory
