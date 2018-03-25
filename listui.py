@@ -22,16 +22,37 @@ def initgpio():
 	print "Initializing GPIO"
 	#Initialize GPIO
 	GPIO.setmode(GPIO.BCM)
+	key={}
 
-	GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(20, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	#key['key1']=21 #broken on menona
+	key['key2']=20
+	key['key3']=16
 
-	GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(6, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	key['left']=5 
+	key['up']=6
+	key['press']=13
+	key['down']=19
+	key['right']=26
+
+	#GPIO.setup(key['key1'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['key2'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['key3'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+	GPIO.setup(key['left'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['up'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['press'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['down'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(key['right'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+	#GPIO.add_event_detect(key['key1'], GPIO.FALLING)
+	GPIO.add_event_detect(key['key2'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['key3'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['left'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['up'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['press'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
+	GPIO.add_event_detect(key['right'], GPIO.FALLING,bouncetime=300)
+
 
 def getKeys(keys={}):
 	#keys={}
@@ -89,64 +110,81 @@ def listMenu(device,mlist,alist,mname,draw=0):
 	#mname: menu name for action context
 	title=mname
 	#initial settings
-	keys={}
+	#keys={}
+	key={}
 	pos=1
 	apos=0
 
+	key['key1']=5 #should be 21, only cuz key1 is broken on menona
+	key['key2']=20
+	key['key3']=16
+
+	key['left']=5 
+	key['up']=6
+	key['press']=13
+	key['down']=19
+	key['right']=26
+	#GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
+
+
 	while True:
-		keys=getKeys(keys)
+		#keys=getKeys(keys)
 		dispListMenu(device,title,mlist,alist,pos)
 
-		if keys["down"]==0:
+		if GPIO.event_detected(key['down']):
+		#if keys["down"]==0:
 			#pos=pos+1
 			pos=posDown(pos)
 			dispListMenu(device,title,mlist,alist,pos)
 
-		elif keys["up"]==0:
+		elif GPIO.event_detected(key['up']):
 			#pos=pos+1
 			pos=posUp(pos)
 			dispListMenu(device,title,mlist,alist,pos)
 
-		elif keys["key2"]==0:
+		elif GPIO.event_detected(key['key2']):
 			dispListMenu(device,title,mlist,alist,pos,apos)
 			cont=actionhandler(device,pos,apos,mname)
 			apos=1
 			if cont==1 : apos=0
 
-			time.sleep(.3)
+			#time.sleep(.3)
 			
 			#action loop
-			
-			while keys["key1"] == 1:
+			done=0
+			while done==0:
 				
 				dispListMenu(device,title,mlist,alist,pos,apos)
 
-				keys=getKeys(keys)
+				#keys=getKeys(keys)
 
-				if keys["down"]==0:
+				if GPIO.event_detected(key['down']):
 					#pos=pos+1
 					apos=posDown(apos,3)
 					dispListMenu(device,title,mlist,alist,pos,apos)
 
-				elif keys["up"]==0:
+				elif GPIO.event_detected(key['up']):
 					#pos=pos+1
 					apos=posUp(apos,3)
 					dispListMenu(device,title,mlist,alist,pos,apos)
 
-				elif keys["key2"]==0:
+				elif GPIO.event_detected(key['key2']):
 					esc=actionhandler(device,pos,apos,mname)
 					if esc==1 : return
 
-					time.sleep(.2)
-			
-				time.sleep(.1)
+				elif GPIO.event_detected(key['key1']):
+					done=1
 
-		elif keys["key1"]==0:
+					#time.sleep(.2)
+			
+				time.sleep(.01)
+
+		elif GPIO.event_detected(key['key1']):
 			dispListMenu(device,title,mlist,alist,pos)
-			time.sleep(.1)
+			#time.sleep(.1)
 			return
 
-		time.sleep(.1)
+		time.sleep(.01)
 
 def testMenu(device):
 	alist=["go", "[empty]","[empty]"]
@@ -160,6 +198,19 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 	#alist: action list
 	#mname: menu name for action context
 	title=mname
+
+	#key definition MOVE TO GLOBAL
+	key={}
+	key['key1']=5 #should be 21, only cuz key1 is broken on menona
+	key['key2']=20
+	key['key3']=16
+
+	key['left']=5 
+	key['up']=6
+	key['press']=13
+	key['down']=19
+	key['right']=26
+
 	#initial settings
 	keys={}
 	pos=1
@@ -180,8 +231,8 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 		dispListMenu(device,title,mlist,alist,pos,0,vpos)
 		time.sleep(.3)
 
-		keys=getKeys(keys)
-		if keys["down"]==0:
+		#keys=getKeys(keys)
+		if GPIO.event_detected(key['down']):
 			#pos=pos+1
 			if pos==5 and vpos<vmax:
 				vpos+=1
@@ -190,7 +241,7 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 				if pos==1:vpos=0
 			#dispListMenu(device,title,mlist,alist,pos)
 
-		elif keys["up"]==0:
+		elif GPIO.event_detected(key['up']):
 			#pos=pos+1
 			if pos==1 and vpos>0:
 				vpos-=1
@@ -199,41 +250,44 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 				if pos==5:vpos=vmax
 			#dispListMenu(device,title,mlist,alist,pos)
 
-		elif keys["key2"]==0:
+		elif GPIO.event_detected(key['key2']):
 			dispListMenu(device,title,mlist,alist,pos,apos,vpos)
 			cont=actionhandler(device,pos+vpos,apos,mname)
 			apos=1
 			if cont==1 : apos=0
 
-			time.sleep(.3)
+			time.sleep(.01)
 			
 			#action loop
 			
-			while keys["key1"] == 1:
+			done=0
+			while done==0:
 				
 				dispListMenu(device,title,mlist,alist,pos,apos,vpos)
 
-				keys=getKeys(keys)
+				#keys=getKeys(keys)
 
-				if keys["down"]==0:
+				if GPIO.event_detected(key['down']):
 					#pos=pos+1
 					apos=posDown(apos,3)
 					dispListMenu(device,title,mlist,alist,pos,apos,vpos)
 
-				elif keys["up"]==0:
+				elif GPIO.event_detected(key['up']):
 					#pos=pos+1
 					apos=posUp(apos,3)
 					dispListMenu(device,title,mlist,alist,pos,apos,vpos)
 
-				elif keys["key2"]==0:
+				elif GPIO.event_detected(key['key2']):
 					esc=actionhandler(device,pos+vpos,apos,mname,vpos)
 					if esc==1 : return
 
-					time.sleep(.2)
+					#time.sleep(.2)
+				elif GPIO.event_detected(key['key1']):
+					done=1
 			
 				time.sleep(.01)
 
-		elif keys["key1"]==0:
+		elif GPIO.event_detected(key['key1']):
 			dispListMenu(device,title,mlist,alist,pos)
 			time.sleep(.1)
 			return
@@ -337,15 +391,19 @@ def actionhandler(device,pos,apos,mname,draw=0):
 
 			return(1)
 	elif mname=="MAIN>TAPES":
-		print "tape actions!"
+		print "tape actions @POS: ",pos,", apos: ",apos
 		if pos==1 and apos==1:
 			loadTape(device,"/home/pi/Desktop/tapes/recycling bin v1/tape")
-		if pos==2 and apos==1:
+		elif pos==2 and apos==1:
 			loadTape(device,"/home/pi/Desktop/tapes/recycling bin v2")
-		if pos==3 and apos==1:
+		elif pos==3 and apos==1:
 			loadTape(device,"/home/pi/Desktop/op1-tapebackups/primarily pentatonic")
-		if pos==4 and apos==1:
+		elif pos==4 and apos==1:
 			loadTape(device,"/home/pi/Desktop/op1-tapebackups/2018-02-24")
+		elif pos==5 and apos==1:
+			loadTape(device,"/home/pi/Desktop/op1-tapebackups/lets start with guitar this time")
+		elif pos==6 and apos==1:
+			loadTape(device,"/home/pi/Desktop/op1-tapebackups/2018-03-25")
 
 	elif mname=="MAIN>SAMPLES":	
 		# 	mlist=["josh", "courtyard","dawless","cmix","more"]
@@ -424,9 +482,9 @@ def actionhandler(device,pos,apos,mname,draw=0):
 	return(0)
 
 def tapeMenu(device):
-	mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","more"]
+	mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
 	alist=["load", "[empty]","[empty]"]
-	listMenu(device,mlist,alist,"MAIN>TAPES")
+	listMenuScroll(device,mlist,alist,"MAIN>TAPES")
 
 
 def sampleMenu(device):
