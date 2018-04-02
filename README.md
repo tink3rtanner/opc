@@ -4,21 +4,15 @@
 ![opc-hardware v2](/opc-beta.jpg)
 
 
-
-Hardware Build v2
+**Hardware Build v2**
 - raspberry pi zero w
 - 1.3in 128x64 ssh1106, driven by luma.io (Also GPIO buttons)
 - pimoro LiPo shim
 - 500 mAh Lithium polymer battery (2-3hr)
 
 
-
-Current State:
-
-python driven ui on display, list-style menus, button interaction
-
-
-Features
+**Current Features**
+- python driven ui on display, list-style menus, button interaction
 - ssh106 64x128 menu UI
 - Tape backup
 - Tape load
@@ -26,7 +20,7 @@ Features
 - Midi forwarding (w/ usb hub)
 
 
-Future Features
+**Future Features**
 - 'scene' load (samples, tape, and presets all at once)
 - updates tape
 - aiff parser
@@ -38,7 +32,7 @@ Future Features
 - drum sample remove whitespace
 
 
-Issues List
+**Pre-Release Issues List**
 - update tape load ui
 - auto-list tapes
 - clean up code
