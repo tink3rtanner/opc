@@ -1,6 +1,10 @@
 # opc
 [alpha] Teenage Engineering Op-1 Companion
 
+![opc-hardware v2](/opc-beta.jpg)
+
+
+
 Hardware Build v2
 - raspberry pi zero w
 - 1.3in 128x64 ssh1106, driven by luma.io (Also GPIO buttons)
