@@ -31,6 +31,7 @@ Future Features
 - copy to external drive
 - google drive backup
 - midi chords
+- drum sample remove whitespace
 
 
 Issues List
