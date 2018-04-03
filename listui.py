@@ -20,6 +20,10 @@ key['press']=13
 key['down']=19
 key['right']=26
 
+
+lowBat=4
+
+
 #LIST OF SAMPLE PACKS AND PATHS
 sampleList=[
 		["_josh","/home/pi/Desktop/samplepacks/josh/"],
@@ -52,8 +56,11 @@ def init():
 	device = sh1106(serial,rotate=2)
 	
 	initgpio()
-	keys=dict(right=0,left=0,up=0,down=0,key1=0,key2=0,key3=0) #init keybase
-	keys=getKeys(keys)
+
+	#boot logo!
+	drawText(device,['','         OPC         ','','     tink3rtanker    '])
+	time.sleep(2)
+
 
 	return device
 
@@ -73,6 +80,9 @@ def initgpio():
 	GPIO.setup(key['press'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 	GPIO.setup(key['down'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 	GPIO.setup(key['right'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	
+	#LIPO LOW BATTERY
+	GPIO.setup(lowBat, GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
 	#GPIO.add_event_detect(key['key1'], GPIO.FALLING)
 	GPIO.add_event_detect(key['key2'], GPIO.FALLING,bouncetime=300)
@@ -83,27 +93,13 @@ def initgpio():
 	GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
 	GPIO.add_event_detect(key['right'], GPIO.FALLING,bouncetime=300)
 
-
-def getKeys(keys={}):
-	#keys={}
-
-	keys['key1']=GPIO.input(5)
-	keys['key2']= GPIO.input(20)
-	keys['key3']= GPIO.input(16)
-
-	keys['left'] = GPIO.input(5)
-	keys['up'] = GPIO.input(6)
-	keys['press'] = GPIO.input(13)
-	keys['down'] = GPIO.input(19)
-	keys['right'] = GPIO.input(26)
-
-
-	return keys
-
 def wait(keys,waitkey):
-	keys=getKeys(keys)
-	while keys[waitkey]==1:
-		keys=getKeys(keys)
+
+	done=0
+	while done==0:
+		if GPIO.event_detected(key[waitkey]):
+			done=1
+		time.sleep(.01)
 	return
 
 def run_cmd(cmd):
@@ -134,112 +130,25 @@ def copytree(src, dst, symlinks=False, ignore=None):
 	except:
 		print "must be an error. file full or smt"
 
-def listMenu(device,mlist,alist,mname,draw=0):
-	#mlist: menu list
-	#alist: action list
-	#mname: menu name for action context
-	title=mname
-	#initial settings
-	#keys={}
-	# key={}
-	pos=1
-	apos=0
-
-	# key['key1']=5 #should be 21, only cuz key1 is broken on menona
-	# key['key2']=20
-	# key['key3']=16
-
-	# key['left']=5 
-	# key['up']=6
-	# key['press']=13
-	# key['down']=19
-	# key['right']=26
-	#GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
-
-
-	while True:
-		#keys=getKeys(keys)
-		dispListMenu(device,title,mlist,alist,pos)
-
-		if GPIO.event_detected(key['down']):
-		#if keys["down"]==0:
-			#pos=pos+1
-			pos=posDown(pos)
-			dispListMenu(device,title,mlist,alist,pos)
-
-		elif GPIO.event_detected(key['up']):
-			#pos=pos+1
-			pos=posUp(pos)
-			dispListMenu(device,title,mlist,alist,pos)
-
-		elif GPIO.event_detected(key['key2']):
-			dispListMenu(device,title,mlist,alist,pos,apos)
-			cont=actionhandler(device,pos,apos,mname)
-			apos=1
-			if cont==1 : apos=0
-
-			#time.sleep(.3)
-			
-			#action loop
-			done=0
-			while done==0:
-				
-				dispListMenu(device,title,mlist,alist,pos,apos)
-
-				#keys=getKeys(keys)
-
-				if GPIO.event_detected(key['down']):
-					#pos=pos+1
-					apos=posDown(apos,3)
-					dispListMenu(device,title,mlist,alist,pos,apos)
-
-				elif GPIO.event_detected(key['up']):
-					#pos=pos+1
-					apos=posUp(apos,3)
-					dispListMenu(device,title,mlist,alist,pos,apos)
-
-				elif GPIO.event_detected(key['key2']):
-					esc=actionhandler(device,pos,apos,mname)
-					if esc==1 : return
-
-				elif GPIO.event_detected(key['key1']):
-					done=1
-
-					#time.sleep(.2)
-			
-				time.sleep(.01)
-
-		elif GPIO.event_detected(key['key1']):
-			dispListMenu(device,title,mlist,alist,pos)
-			#time.sleep(.1)
-			return
-
-		time.sleep(.01)
-
-def testMenu(device):
+def sysMenu(device):
 	alist=["go", "[empty]","[empty]"]
-	mlist=["test1","test2","test3","test4","test5","test6","test7","asdf","asdfg","more tests"]
+	mlist=["wireless","reboot","nest test","test4","test5","test6","test7","asdf","asdfg","more tests"]
 
-	listMenuScroll(device,mlist,alist,"MENU>TEST")
+	listMenuScroll(device,mlist,alist,"MAIN>SYS")
 
+def nestMenu(device):
+	alist=["[empty]", "[empty]","[empty]"]
+	mlist=["nest test!","test5d","test6","test7","asdf","asdfg","more tests"]
 
-def listMenuScroll(device,mlist,alist,mname,draw=0):
+	listMenuScroll(device,mlist,alist,"MAIN>SYS>NEST")
+
+def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 	#mlist: menu list
 	#alist: action list
 	#mname: menu name for action context
 	title=mname
 
 	#key definition MOVE TO GLOBAL
-	key={}
-	key['key1']=5 #should be 21, only cuz key1 is broken on menona
-	key['key2']=20
-	key['key3']=16
-
-	key['left']=5 
-	key['up']=6
-	key['press']=13
-	key['down']=19
-	key['right']=26
 
 	#initial settings
 	keys={}
@@ -261,7 +170,6 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 		dispListMenu(device,title,mlist,alist,pos,0,vpos)
 		time.sleep(.3)
 
-		#keys=getKeys(keys)
 		if GPIO.event_detected(key['down']):
 			#pos=pos+1
 			if pos==5 and vpos<vmax:
@@ -281,21 +189,24 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 			#dispListMenu(device,title,mlist,alist,pos)
 
 		elif GPIO.event_detected(key['key2']):
-			dispListMenu(device,title,mlist,alist,pos,apos,vpos)
-			cont=actionhandler(device,pos+vpos,apos,mname)
-			apos=1
-			if cont==1 : apos=0
-
-			time.sleep(.01)
+			#dispListMenu(device,title,mlist,alist,pos,apos,vpos)
+			actionhandler(device,pos+vpos,apos,mname)
 			
+			
+			if actions==True:
+				done=0
+				apos=1
+			else:
+				done=1
+				apos=0
+
+
 			#action loop
 			
-			done=0
+			#done=0
 			while done==0:
 				
 				dispListMenu(device,title,mlist,alist,pos,apos,vpos)
-
-				#keys=getKeys(keys)
 
 				if GPIO.event_detected(key['down']):
 					#pos=pos+1
@@ -308,21 +219,29 @@ def listMenuScroll(device,mlist,alist,mname,draw=0):
 					dispListMenu(device,title,mlist,alist,pos,apos,vpos)
 
 				elif GPIO.event_detected(key['key2']):
-					esc=actionhandler(device,pos+vpos,apos,mname,vpos)
-					if esc==1 : return
+					actionhandler(device,pos+vpos,apos,mname,vpos)
+					apos=0
+					done=1
 
 					#time.sleep(.2)
+				# back exit
 				elif GPIO.event_detected(key['key1']):
 					done=1
+					apos=0
 			
 				time.sleep(.01)
 
-		elif GPIO.event_detected(key['key1']):
-			dispListMenu(device,title,mlist,alist,pos)
-			time.sleep(.1)
-			return
 
-		#time.sleep(.1)
+		#// EXIT STRATEGY
+		
+
+
+		elif GPIO.event_detected(key['key1']):
+			if exit==True:
+
+				return
+
+		time.sleep(.01)
 
 def posUp(pos,lmax=5):
 	if pos != 1:
@@ -374,10 +293,20 @@ def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 		#draw.rectangle((1,10,126,11), outline="black", fill="black")
 		draw.text((2,0),title,"black")
 
+		# // STATUS BAR //
+
 		if os.path.exists("/media/pi/OP1")==1:
 			draw.rectangle((116,2,124,10), outline="black", fill="black")
 		else:
 			draw.rectangle((116,2,124,10), outline="black", fill="white")
+
+		if GPIO.event_detected(lowBat):
+			draw.rectangle((96,3,108,9), outline="black", fill="black")
+		else:
+			draw.rectangle((96,3,108,9), outline="black", fill="white")
+
+
+
 
 		if pos != 0:
 			draw.rectangle((xdist, pos*10+yoffset, xdist+width, (pos*10)+10+yoffset), outline="white", fill="white")
@@ -398,7 +327,12 @@ def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 				draw.text((axdist,(idx+1)*10+yoffset),line,alistc[idx])
 
 def actionhandler(device,pos,apos,mname,draw=0):
+
 	#returning 1 escapes calling function to return
+	print 'action handler @',mname
+	print "pos: ",pos,"apos" ,apos
+
+
 	if mname=="MAIN":
 		if pos==1 and apos==0:
 			print 'main: tape menu'
@@ -415,7 +349,7 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			midiMenu(device)
 
 		elif pos==5 and apos==0:
-			testMenu(device)
+			sysMenu(device)
 			#run_cmd("sudo python ui.py -i spi -d sh1106 -r 2 &")
 
 
@@ -428,7 +362,8 @@ def actionhandler(device,pos,apos,mname,draw=0):
 
 	elif mname=="MAIN>SAMPLES":	
 
-		print "sample actions",pos
+		
+
 		#if pos==1 or 2 or 3 or 4 or 5 or 6 or 7: 
 		#assuming pos is valid bc was built from sampleList
 		spath=sampleList[pos-1][1]
@@ -457,14 +392,28 @@ def actionhandler(device,pos,apos,mname,draw=0):
 		drawText(device,[out,"done"])
 		time.sleep(1)
 
-	elif mname=="MENU>TEST":
-		print "test actions"
-		#print pos
-		#mlist=["test1","test2","test3","test4","test5","test6","test7"]
-		#print mlist[pos-1]
+	elif mname=="MAIN>SYS":
 
+		if pos==1:
+			
+			getip="ip addr show wlan0 | grep inet | awk '{print $2}' | cut -d/ -f1"
+			netstat=run_cmd(getip)
+			ip=netstat[:-27]
 
+			print("wlan0 status")
+			print ip
 
+			drawText(device,["wlan0 status",ip])
+			wait({},"key3")
+		# 	term.println(ip)
+		elif pos==2: #reboot
+			drawText(device,['rebooting...'])
+			run_cmd("sudo reboot")
+			return
+
+		elif pos==3:
+			print 'nestTest'
+			nestMenu(device)
 
 
 	return(0)
@@ -475,8 +424,7 @@ def tapeMenu(device):
 		mlist.append(item[0])
 	#mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
 	alist=["load", "[empty]","[empty]"]
-	listMenuScroll(device,mlist,alist,"MAIN>TAPES")
-
+	listMenuScroll(device,mlist,alist,"MAIN>TAPES",None,True)
 
 def sampleMenu(device):
 	#mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
@@ -485,7 +433,7 @@ def sampleMenu(device):
 		mlist.append(item[0])
 
 	alist=["load", "unload","[empty]"]
-	listMenuScroll(device,mlist,alist,"MAIN>SAMPLES")	
+	listMenuScroll(device,mlist,alist,"MAIN>SAMPLES",None,True)	
 
 def drawText(device,textlist):
 	with canvas(device) as draw:
@@ -504,12 +452,9 @@ def midiMenu(device):
 
 	mlist=["14:20", "20:14","20:24","24:20"]
 	alist=["go", "[empty]","[empty]"]
-	listMenu(device,mlist,alist,"MAIN>MIDI")
-
+	listMenuScroll(device,mlist,alist,"MAIN>MIDI")
 
 def backupTape(device):
-	keys={}
-	# with canvas(device) as draw:
 
 	if os.path.exists("/media/pi/OP1")==1:
 
@@ -534,8 +479,7 @@ def backupTape(device):
 		
 		#response loop
 		while True:
-			keys=getKeys(keys)
-			if keys['key2']==0:
+			if GPIO.event_detected(key['key2']):
 				print "copying"
 				#draw.text((0,10),"copying","white")
 				#draw.text((0,20),"Backup tape?","white")
@@ -554,28 +498,29 @@ def backupTape(device):
 				# 	term.println('file exists')
 				# 	time.sleep(.5)
 				# 	return   					can't check this now. assuming source directory is real
-				
+				drawText(device,["copying..."])
+
 				sh.copy(spath1,dpath)
 				print 'Track 1 Copied'
-				drawText(device,["track 1 copied"])
+				drawText(device,["copying...","track 1 copied"])
 
 				sh.copy(spath2,dpath)
 				print 'Track 2 Copied'
-				drawText(device,["track 1 copied","track 2 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied"])
 
 				sh.copy(spath3,dpath)
 				print 'Track 3 Copied'
-				drawText(device,["track 1 copied","track 2 copied","track 3 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied","track 3 copied"])
 
 				sh.copy(spath4,dpath)
 				print 'Track 4 Copied'
-				drawText(device,["track 1 copied","track 2 copied","track 3 copied","track 4 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied","track 3 copied","track 4 copied"])
 
 
 				time.sleep(.5)
 				return
 
-			elif keys['key1']==0:
+			elif GPIO.event_detected(key['key1']):
 				return
 	else:
 		print "no op1 detcted"
@@ -605,8 +550,7 @@ def loadTape(device,source):
 
 		#response loop
 		while True:
-			keys=getKeys(keys)
-			if keys['key2']==0:
+			if GPIO.event_detected(key['key2']):
 				print "copying"
 
 
@@ -634,23 +578,27 @@ def loadTape(device,source):
 				# if os.path.exists(spath)==1:
 				# 	term.println('file exists')
 				# 	time.sleep(.5)
-				# 	return   					can't check this now. assuming source directory is real
+				# 	return   					
+				# can't check this now. assuming source directory is real
+
 				
+				drawText(device,["copying..."])
+
 				sh.copy(spath1,dpath)
 				print 'Track 1 Copied'
-				drawText(device,["track 1 copied"])
+				drawText(device,["copying...","track 1 copied"])
 
 				sh.copy(spath2,dpath)
 				print 'Track 2 Copied'
-				drawText(device,["track 1 copied","track 2 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied"])
 
 				sh.copy(spath3,dpath)
 				print 'Track 3 Copied'
-				drawText(device,["track 1 copied","track 2 copied","track 3 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied","track 3 copied"])
 
 				sh.copy(spath4,dpath)
 				print 'Track 4 Copied'
-				drawText(device,["track 1 copied","track 2 copied","track 3 copied","track 4 copied"])
+				drawText(device,["copying...","track 1 copied","track 2 copied","track 3 copied","track 4 copied"])
 
 
 
@@ -659,7 +607,7 @@ def loadTape(device,source):
 				time.sleep(.5)
 				return
 
-			elif keys['key1']==0:
+			elif GPIO.event_detected(key['key1']):
 				return
 	else:
 		print "no op1 detcted"
@@ -693,8 +641,7 @@ def loadUnloadSample(device,spath,name,op):
 
 
 		while True:
-			keys=getKeys()
-			if keys['key2']==0:
+			if GPIO.event_detected(key['key2']):
 				print "copying"
 
 				dpath="/media/pi/OP1/synth/_" + str(name) + "/"
@@ -713,7 +660,7 @@ def loadUnloadSample(device,spath,name,op):
 					return
 
 
-			elif keys['key1']==0:
+			elif GPIO.event_detected(key['key1']):
 				return
 	else:
 		print "no op1 detcted"
@@ -725,15 +672,13 @@ def loadUnloadSample(device,spath,name,op):
 
 		wait(keys,'key1')
 
-
 def main():
 	device=init()
 
 	#MAIN MENU
-	mlist=["load tape", "backup tape","sample packs","midi","listMenuScroll"]
+	mlist=["tape deck", "backup tape","sample packs","midi","system"]
 	alist=["action1", "action2","action3"]
-	listMenu(device,mlist,alist,"MAIN")
-
+	listMenuScroll(device,mlist,alist,"MAIN",None,None,False) #no exit
 
 
 main()
