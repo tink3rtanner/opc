@@ -38,3 +38,14 @@
 - clean up code
 - update mounting code (use https://github.com/tacoe/OP1GO/blob/master/op1go.py)
 
+**Changelog**
+3/18/2018:  - Uploaded alpha to github
+3/25/2018:  - Updated GPIO from polling to event detection
+            - Moved sampleList and tapeList to globals to make extensible
+4/2/2018:   - added boot logo ;)
+            - added system menu w/ wlan,reboot,test
+            - updated wait to event detection
+            - added exit & action parameters to listmenu scroll, fixed return bug
+            - depricated listMenu
+            - attempt at low battery status bar (doesnt work)
+            - general cleanup
