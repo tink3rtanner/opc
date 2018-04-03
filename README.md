@@ -56,4 +56,3 @@
 - attempt at low battery status bar (doesnt work)
 - general cleanup
             
-end
