@@ -42,9 +42,11 @@
 
 3/18/2018:
 - Uploaded alpha to github
+
 3/25/2018:
 - Updated GPIO from polling to event detection
 - Moved sampleList and tapeList to globals to make extensible
+
 4/2/2018:
 - added boot logo ;)
 - added system menu w/ wlan,reboot,test
