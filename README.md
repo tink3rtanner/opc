@@ -8,24 +8,24 @@
 - raspberry pi zero w
 - 1.3in 128x64 ssh1106, driven by luma.io (Also GPIO buttons)
 - pimoro LiPo shim
-- 500 mAh Lithium polymer battery (2-3hr)
+- 500 mAh Lithium polymer battery (2-3hr runtime)
 
 
 **Current Features**
 - python driven ui on display, list-style menus, button interaction
 - ssh106 64x128 menu UI
 - Tape backup
-- Tape load
-- Sample pack load/delete
-- Midi forwarding (w/ usb hub)
+- Tape load (from directory listing)
+- Sample packs load/delete (from defined list)
+- Midi forwarding (w/ usb hub model[mendota])
+- firmware load (got a case of the slanty stripes? reformat on the road when messy tapes corrupt your filesystem now!)
 
 
 **Future Features**
 - 'scene' load (samples, tape, and presets all at once)
-- updates tape
-- aiff parser
-- count file capacity of op1 sampler/drum
-- auto-list directory
+- name & update tapes (text input is going to be ugh.)
+- aiff parser (theres some cool goodies in .aiff metadata)
+- count file capacity of op1 sampler/drum (how close are you to the magic 42?)
 - copy to external drive
 - google drive backup
 - midi chords
@@ -33,10 +33,11 @@
 
 
 **Pre-Release Issues List**
-- update tape load ui
-- auto-list tapes
-- clean up code
-- update mounting code (use https://github.com/tacoe/OP1GO/blob/master/op1go.py)
+- *sample load synth/drum split*
+- update mounting code (ref https://github.com/tacoe/OP1GO/blob/master/op1go.py)
+- clean up, organize code
+- pc-independent
+- loading bar
 
 **Changelog**
 
