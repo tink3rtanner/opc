@@ -34,6 +34,7 @@
 
 **Pre-Release Issues List**
 - *sample load synth/drum split*
+- forces op-1 to defrag... like a lot
 - update mounting code (ref https://github.com/tacoe/OP1GO/blob/master/op1go.py)
   - find op1 mount directory
 - low battery indicator
