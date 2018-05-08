@@ -26,7 +26,15 @@ opc-slim, hardware v2. Significantly thinner with onboard charging and a switch!
 - pimor lipo charging
 - on-off switch
 
+![opc top view](/duo_topview.jpg)
+###### [top view, menona left and mendota right]
 
+![opc bottom view](/duo_buttomview.jpg)
+###### [top view, menona left and mendota right]
+
+
+![opc top view](/duo_mixedview.jpg)
+###### [mixed view, menona left and mendota right]
 
 
 
