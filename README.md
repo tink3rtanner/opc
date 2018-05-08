@@ -35,6 +35,7 @@
 **Pre-Release Issues List**
 - *sample load synth/drum split*
 - update mounting code (ref https://github.com/tacoe/OP1GO/blob/master/op1go.py)
+- low battery indicator
 - clean up, organize code
 - pc-independent
 - loading bar
