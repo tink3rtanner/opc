@@ -55,4 +55,7 @@
 - depricated listMenu
 - attempt at low battery status bar (doesnt work)
 - general cleanup
-            
+
+5/7/2018
+- firmware upload (op1-225.op1) (reformat on the road when messy tapes corrupt your filesystem)
+- tapeMenu now autobuilds from a directory (no input checking, be careful!)
