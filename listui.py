@@ -33,10 +33,18 @@ sampleList=[
 		["inkd","/home/pi/Desktop/samplepacks/op1_3.2/inkdd/"],
 		["Dark Energy","/home/pi/Desktop/samplepacks/op1_3.2/Dark Energy/"],
 		["memories","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/memories/"],
-		["opines","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/opines/"]
+		["opines","/home/pi/Desktop/samplepacks/CUCKOO OP-1 MEGA PACK/CUCKOO OP-1 MEGA PACK/OP-1 patches/Put in synth/opines/"],
+		["vanilla sun","/home/pi/Desktop/samplepacks/vanilla sun/"],
+		["mellotron","/home/pi/Desktop/samplepacks/mellotronAifs/"],
+		["hs dsynth","/home/pi/Desktop/samplepacks/hs dsynth vol1/"],
+		["SammyJams","/home/pi/Desktop/samplepacks/SammyJams Patches"]
+
+
+
+
 
 		]
-#List of tapes an paths
+#List of tapes and paths
 tapeList=[
 		["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
 		["recycling bin v2","/home/pi/Desktop/tapes/recycling bin v2"],
@@ -46,8 +54,16 @@ tapeList=[
 		["2018-02-24","/home/pi/Desktop/op1-tapebackups/2018-02-24"],
 		["lets start with guitar","/home/pi/Desktop/op1-tapebackups/lets start with guitar this time"],
 		["spaceman","/home/pi/Desktop/op1-tapebackups/2018-03-25"],
+		["slow & somber","/home/pi/Desktop/op1-tapebackups/slow & somber"],
+		["cool solo","/home/pi/Desktop/op1-tapebackups/cool solo"],
+		["technical advantage","/home/pi/Desktop/op1-tapebackups/technical advantage"],
+		["heartbeat slide","/home/pi/Desktop/op1-tapebackups/heartbeat slide"]
 
 		]
+print tapeList
+keys={}
+
+tapeList=[["test","test"]]
 
 
 def init():
@@ -132,7 +148,7 @@ def copytree(src, dst, symlinks=False, ignore=None):
 
 def sysMenu(device):
 	alist=["go", "[empty]","[empty]"]
-	mlist=["wireless","reboot","nest test","test4","test5","test6","test7","asdf","asdfg","more tests"]
+	mlist=["wireless","reboot","nest test","load firmware","test5","test6","test7","asdf","asdfg","more tests"]
 
 	listMenuScroll(device,mlist,alist,"MAIN>SYS")
 
@@ -147,6 +163,7 @@ def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 	#alist: action list
 	#mname: menu name for action context
 	title=mname
+	print mlist
 
 	#key definition MOVE TO GLOBAL
 
@@ -263,7 +280,6 @@ def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 		mlist=plist[vpos:vpos+5]
 	else:
 		mlist=plist
-
 
 
 	#offsets
@@ -415,14 +431,21 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			print 'nestTest'
 			nestMenu(device)
 
+		elif pos==4:
+			print 'loading firmware'
+			loadFirmware(device)
+
 
 	return(0)
 
 def tapeMenu(device):
+	print "building menu list"
 	mlist=[]
+	tapePath(device)
 	for item in tapeList: #build menu list from tapeList global
 		mlist.append(item[0])
 	#mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
+	
 	alist=["load", "[empty]","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>TAPES",None,True)
 
@@ -434,6 +457,48 @@ def sampleMenu(device):
 
 	alist=["load", "unload","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>SAMPLES",None,True)	
+
+def tapePath(device):
+	directory="/home/pi/Desktop/op1-tapebackups/"
+
+	print "updating tape index"
+	drawText(device,['updating tape index'])
+	#tapelist=[
+	# 	["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
+	# 	["recycling bin v2","/home/pi/Desktop/tapes/recycling bin v2"]
+	# 	]
+
+	for filename in os.listdir(directory):
+		print filename
+		fullPath = directory + filename
+		tapeList.append([filename,fullPath])
+	    #if filename.endswith(".atm") or filename.endswith(".py"): 
+
+
+	print tapeList
+
+def loadFirmware(device):
+	if os.path.exists("/media/pi/OP-1")==1:
+		drawText(device,["op1 connection success","load firmware?"," -yup"," -back"])
+		while True:
+			if GPIO.event_detected(key['key2']):
+				print "copying firmware"
+				drawText(device,["copying firmware..."])
+				spath="/home/pi/Desktop/misc/op1_225.op1"
+				dpath="/media/pi/OP-1/"
+				sh.copy(spath,dpath)
+				return
+
+
+			elif GPIO.event_detected(key['key1']):
+				return
+
+
+	else:
+		drawText(device,["op1 not detected","","returning to menu..."])
+		time.sleep(1)
+		return
+
 
 def drawText(device,textlist):
 	with canvas(device) as draw:
@@ -465,7 +530,7 @@ def backupTape(device):
 		# 	draw.text((0,30),"2-yes","white")
 		
 		# time.sleep(1)
-		drawText(device,["op1 connection success","backup tape?","1-back","2-yes"])
+		drawText(device,["op1 connection success","backup tape?"," -yup"," -back"])
 
 			# 			# sh.copy(spath4,dpath)
 			# draw.text((0,40),"Track 4 copied","white")
@@ -545,7 +610,7 @@ def loadTape(device,source):
 		print "  1-Yes"
 		print "  2-No"
 
-		drawText(device,["op1 connection success","load tape?","1-back","2-yes"])
+		drawText(device,["op1 connection success","load tape?"," - back","2-yes"])
 
 
 		#response loop
@@ -581,7 +646,7 @@ def loadTape(device,source):
 				# 	return   					
 				# can't check this now. assuming source directory is real
 
-				
+
 				drawText(device,["copying..."])
 
 				sh.copy(spath1,dpath)
