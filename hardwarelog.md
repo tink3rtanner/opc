@@ -2,6 +2,7 @@
 Teenage Engineering Op-1 Companion
 
 ![opc-hardware v2](/opc-beta.jpg)
+[opc *mendota* above and opc-slim *menona* showing the main menu in the center]
 
 # Mendota
 the original opc. can even act as a usb midi host!
