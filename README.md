@@ -1,5 +1,5 @@
 # opc
-[alpha] Teenage Engineering Op-1 Companion
+[beta] Teenage Engineering Op-1 Companion
 
 ![opc-hardware v2](/opc-beta.jpg)
 
