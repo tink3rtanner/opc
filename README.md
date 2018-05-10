@@ -17,6 +17,7 @@
 - Tape backup
 - Tape load (from directory listing)
 - Sample packs load/delete (from defined list)
+- Samba file server accessable via pc or android
 - Midi forwarding (w/ usb hub model[mendota])
 - firmware load (got a case of the slanty stripes? reformat on the road when messy tapes corrupt your filesystem now!)
 
