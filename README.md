@@ -61,6 +61,11 @@
 - attempt at low battery status bar (doesnt work)
 - general cleanup
 
-5/7/2018
+5/7/2018:
 - firmware upload (op1-225.op1) (reformat on the road when messy tapes corrupt your filesystem)
 - tapeMenu now autobuilds from a directory (no input checking, be careful!)
+
+5/15/2018:
+- organized functions
+- readAif metadata scanner (get's cool aiff metadata. will use to discriminate synth&drum for sampleload)
+- pulled out op1 mount path. want to make this extensible but it's one arg for now, tied to my device id.
