@@ -23,10 +23,12 @@ key['right']=26
 
 lowBat=4
 
+op1path="/media/pi/54FF-1FEE"
+
 
 #LIST OF SAMPLE PACKS AND PATHS
 sampleList=[
-		["_josh","/home/pi/Desktop/samplepacks/josh/"],
+		["_josh","/home/pi/Desktop/samplepacks/_josh/"],
 		["courtyard","/home/pi/Desktop/samplepacks/courtyard/"],
 		["dawless","/home/pi/Desktop/samplepacks/dawless/"],
 		["C-MIX","/home/pi/Desktop/samplepacks/C-MIX/"],
@@ -37,9 +39,8 @@ sampleList=[
 		["vanilla sun","/home/pi/Desktop/samplepacks/vanilla sun/"],
 		["mellotron","/home/pi/Desktop/samplepacks/mellotronAifs/"],
 		["hs dsynth","/home/pi/Desktop/samplepacks/hs dsynth vol1/"],
+		["cassette","/home/pi/Desktop/samplepacks/cassette/"],
 		["SammyJams","/home/pi/Desktop/samplepacks/SammyJams Patches"]
-
-
 
 
 
@@ -65,6 +66,7 @@ keys={}
 
 tapeList=[["test","test"]]
 
+# INITIALIZATION
 
 def init():
 
@@ -109,6 +111,16 @@ def initgpio():
 	GPIO.add_event_detect(key['down'], GPIO.FALLING,bouncetime=300)
 	GPIO.add_event_detect(key['right'], GPIO.FALLING,bouncetime=300)
 
+
+# SYSTEM UTILITIES
+
+def run_cmd(cmd):
+	p = Popen(cmd, shell=True, stdout=PIPE)
+	output = p.communicate()[0]
+	return output
+
+# UI UTILITES
+
 def wait(keys,waitkey):
 
 	done=0
@@ -118,45 +130,104 @@ def wait(keys,waitkey):
 		time.sleep(.01)
 	return
 
-def run_cmd(cmd):
-	p = Popen(cmd, shell=True, stdout=PIPE)
-	output = p.communicate()[0]
-	return output
+def actionhandler(device,pos,apos,mname,draw=0):
 
-def copytree(src, dst, symlinks=False, ignore=None):
-	ct=0
-	print str(len(os.listdir(src))) + " files to move"
+	#returning 1 escapes calling function to return
+	print 'action handler @',mname
+	print "pos: ",pos,"apos" ,apos
 
-	try:
-		for item in os.listdir(src):
-			s = os.path.join(src, item)
-			print "source file: ", s
+
+	if mname=="MAIN":
+		if pos==1 and apos==0:
+			print 'main: tape menu'
+			#MAIN MENU
+			tapeMenu(device)
+			return(1)
+		elif pos==2:
+			backupTape(device)
+
+		elif pos==3:
+			sampleMenu(device)
+
+		elif pos==4: 
+			midiMenu(device)
+
+		elif pos==5 and apos==0:
+			sysMenu(device)
+			#run_cmd("sudo python ui.py -i spi -d sh1106 -r 2 &")
+
+
+			return(1)
+	elif mname=="MAIN>TAPES":
+		print "tape actions @POS: ",pos,", apos: ",apos	
+
+		if apos==1: #assuming pos is valid becasue menuList was built from tapeList
+			loadTape(device,tapeList[pos-1][1])
+
+	elif mname=="MAIN>SAMPLES":	
+
+		
+
+		#if pos==1 or 2 or 3 or 4 or 5 or 6 or 7: 
+		#assuming pos is valid bc was built from sampleList
+		spath=sampleList[pos-1][1]
+		if apos==1:
+			loadUnloadSample(device,spath,sampleList[pos-1][0],"load")
+		elif apos==2:
+			loadUnloadSample(device,spath,sampleList[pos-1][0],"delete")
+
+	elif mname=="MAIN>MIDI":
+		print "midi actions"
+		if pos==1:
+			midiSrc="14"
+			midiDst="20"
+		elif pos==2:
+			midiSrc="20"
+			midiDst="14"
+		elif pos==3:
+			midiSrc="20"
+			midiDst="24"
+		elif pos==4:
+			midiSrc="24"
+			midiDst="20"
+
+
+		out=run_cmd('sudo aconnect '+midiSrc+" "+midiDst)
+		drawText(device,[out,"done"])
+		time.sleep(1)
+
+	elif mname=="MAIN>SYS":
+
+		if pos==1:
 			
-			d = os.path.join(dst, item)
-			if os.path.isdir(dst)==0:
-				print "destination doesn't exist. creating..."
-				os.mkdir(dst)
-			if os.path.isdir(s):
-				print "recurse!"
-				sh.copytree(s, d, symlinks, ignore)
-			else:
-				sh.copy(s, d)
-				ct+=1
-				print "file "+str(ct)+" moved"
-	except:
-		print "must be an error. file full or smt"
+			getip="ip addr show wlan0 | grep inet | awk '{print $2}' | cut -d/ -f1"
+			netstat=run_cmd(getip)
+			ip=netstat[:-27]
 
-def sysMenu(device):
-	alist=["go", "[empty]","[empty]"]
-	mlist=["wireless","reboot","nest test","load firmware","test5","test6","test7","asdf","asdfg","more tests"]
+			print("wlan0 status")
+			print ip
 
-	listMenuScroll(device,mlist,alist,"MAIN>SYS")
+			drawText(device,["wlan0 status",ip])
+			wait({},"key3")
+		# 	term.println(ip)
+		elif pos==2: #reboot
+			drawText(device,['rebooting...'])
+			run_cmd("sudo reboot")
+			return
 
-def nestMenu(device):
-	alist=["[empty]", "[empty]","[empty]"]
-	mlist=["nest test!","test5d","test6","test7","asdf","asdfg","more tests"]
+		elif pos==3:
+			print 'nestTest'
+			nestMenu(device)
 
-	listMenuScroll(device,mlist,alist,"MAIN>SYS>NEST")
+		elif pos==4:
+			print 'loading firmware'
+			loadFirmware(device)
+
+
+	return(0)
+
+
+# DISPLAY UTILITIES
 
 def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 	#mlist: menu list
@@ -260,20 +331,6 @@ def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 
 		time.sleep(.01)
 
-def posUp(pos,lmax=5):
-	if pos != 1:
-		pos=pos-1
-	else:
-		pos=lmax
-	return pos
-
-def posDown(pos,lmax=5):
-	if pos != lmax:
-		pos+=1
-	else:
-		pos=1
-	return pos
-
 def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 	
 	if vpos!=999:
@@ -311,7 +368,7 @@ def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 
 		# // STATUS BAR //
 
-		if os.path.exists("/media/pi/OP1")==1:
+		if os.path.exists(op1path)==1:
 			draw.rectangle((116,2,124,10), outline="black", fill="black")
 		else:
 			draw.rectangle((116,2,124,10), outline="black", fill="white")
@@ -342,112 +399,29 @@ def dispListMenu(device,title,plist,alist,pos,apos=0,vpos=999):
 				#print("idx: ",idx,"line: ",line,"fill: ",flist[idx])
 				draw.text((axdist,(idx+1)*10+yoffset),line,alistc[idx])
 
-def actionhandler(device,pos,apos,mname,draw=0):
+def posUp(pos,lmax=5):
+	if pos != 1:
+		pos=pos-1
+	else:
+		pos=lmax
+	return pos
 
-	#returning 1 escapes calling function to return
-	print 'action handler @',mname
-	print "pos: ",pos,"apos" ,apos
+def posDown(pos,lmax=5):
+	if pos != lmax:
+		pos+=1
+	else:
+		pos=1
+	return pos
 
-
-	if mname=="MAIN":
-		if pos==1 and apos==0:
-			print 'main: tape menu'
-			#MAIN MENU
-			tapeMenu(device)
-			return(1)
-		elif pos==2:
-			backupTape(device)
-
-		elif pos==3:
-			sampleMenu(device)
-
-		elif pos==4: 
-			midiMenu(device)
-
-		elif pos==5 and apos==0:
-			sysMenu(device)
-			#run_cmd("sudo python ui.py -i spi -d sh1106 -r 2 &")
+def drawText(device,textlist):
+	with canvas(device) as draw:
+		for idx,text in enumerate(textlist):
+			#print text, ", ", idx
+			draw.text((0,idx*10),text,"white")
 
 
-			return(1)
-	elif mname=="MAIN>TAPES":
-		print "tape actions @POS: ",pos,", apos: ",apos	
 
-		if apos==1: #assuming pos is valid becasue menuList was built from tapeList
-			loadTape(device,tapeList[pos-1][1])
-
-	elif mname=="MAIN>SAMPLES":	
-
-		
-
-		#if pos==1 or 2 or 3 or 4 or 5 or 6 or 7: 
-		#assuming pos is valid bc was built from sampleList
-		spath=sampleList[pos-1][1]
-		if apos==1:
-			loadUnloadSample(device,spath,sampleList[pos-1][0],"load")
-		elif apos==2:
-			loadUnloadSample(device,spath,sampleList[pos-1][0],"delete")
-
-	elif mname=="MAIN>MIDI":
-		print "midi actions"
-		if pos==1:
-			midiSrc="14"
-			midiDst="20"
-		elif pos==2:
-			midiSrc="20"
-			midiDst="14"
-		elif pos==3:
-			midiSrc="20"
-			midiDst="24"
-		elif pos==4:
-			midiSrc="24"
-			midiDst="20"
-
-
-		out=run_cmd('sudo aconnect '+midiSrc+" "+midiDst)
-		drawText(device,[out,"done"])
-		time.sleep(1)
-
-	elif mname=="MAIN>SYS":
-
-		if pos==1:
-			
-			getip="ip addr show wlan0 | grep inet | awk '{print $2}' | cut -d/ -f1"
-			netstat=run_cmd(getip)
-			ip=netstat[:-27]
-
-			print("wlan0 status")
-			print ip
-
-			drawText(device,["wlan0 status",ip])
-			wait({},"key3")
-		# 	term.println(ip)
-		elif pos==2: #reboot
-			drawText(device,['rebooting...'])
-			run_cmd("sudo reboot")
-			return
-
-		elif pos==3:
-			print 'nestTest'
-			nestMenu(device)
-
-		elif pos==4:
-			print 'loading firmware'
-			loadFirmware(device)
-
-
-	return(0)
-
-def tapeMenu(device):
-	print "building menu list"
-	mlist=[]
-	tapePath(device)
-	for item in tapeList: #build menu list from tapeList global
-		mlist.append(item[0])
-	#mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
-	
-	alist=["load", "[empty]","[empty]"]
-	listMenuScroll(device,mlist,alist,"MAIN>TAPES",None,True)
+# MENUS
 
 def sampleMenu(device):
 	#mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
@@ -458,53 +432,19 @@ def sampleMenu(device):
 	alist=["load", "unload","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>SAMPLES",None,True)	
 
-def tapePath(device):
-	directory="/home/pi/Desktop/op1-tapebackups/"
+def tapeMenu(device):
+	print "building menu list"
+	mlist=[]
+	scanTapes(device)
+	for item in tapeList: #build menu list from tapeList global
+		mlist.append(item[0])
+	#mlist=["recycling bin v1", "recycling bin v2","primarily pentatonic","2018-02-24","lets start with guitar this time","spaceman"]
+	
+	alist=["load", "[empty]","[empty]"]
+	listMenuScroll(device,mlist,alist,"MAIN>TAPES",None,True)
 
-	print "updating tape index"
-	drawText(device,['updating tape index'])
-	#tapelist=[
-	# 	["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
-	# 	["recycling bin v2","/home/pi/Desktop/tapes/recycling bin v2"]
-	# 	]
-
-	for filename in os.listdir(directory):
-		print filename
-		fullPath = directory + filename
-		tapeList.append([filename,fullPath])
-	    #if filename.endswith(".atm") or filename.endswith(".py"): 
-
-
-	print tapeList
-
-def loadFirmware(device):
-	if os.path.exists("/media/pi/OP-1")==1:
-		drawText(device,["op1 connection success","load firmware?"," -yup"," -back"])
-		while True:
-			if GPIO.event_detected(key['key2']):
-				print "copying firmware"
-				drawText(device,["copying firmware..."])
-				spath="/home/pi/Desktop/misc/op1_225.op1"
-				dpath="/media/pi/OP-1/"
-				sh.copy(spath,dpath)
-				return
-
-
-			elif GPIO.event_detected(key['key1']):
-				return
-
-
-	else:
-		drawText(device,["op1 not detected","","returning to menu..."])
-		time.sleep(1)
-		return
-
-
-def drawText(device,textlist):
-	with canvas(device) as draw:
-		for idx,text in enumerate(textlist):
-			#print text, ", ", idx
-			draw.text((0,idx*10),text,"white")
+	if ['test', 'test'] in tapeList: 
+		tapeList.remove(['test','test'])
 
 def midiMenu(device):
 	
@@ -519,9 +459,25 @@ def midiMenu(device):
 	alist=["go", "[empty]","[empty]"]
 	listMenuScroll(device,mlist,alist,"MAIN>MIDI")
 
+def sysMenu(device):
+	alist=["go", "[empty]","[empty]"]
+	mlist=["wireless","reboot","nest test","load firmware","rename op1","test6","test7","asdf","asdfg","more tests"]
+
+	listMenuScroll(device,mlist,alist,"MAIN>SYS")
+
+def nestMenu(device):
+	alist=["[empty]", "[empty]","[empty]"]
+	mlist=["nest test!","test5d","test6","test7","asdf","asdfg","more tests"]
+
+	listMenuScroll(device,mlist,alist,"MAIN>SYS>NEST")
+
+
+
+# FILE OPERATIONS
+
 def backupTape(device):
 
-	if os.path.exists("/media/pi/OP1")==1:
+	if os.path.exists(op1path)==1:
 
 		# with canvas(device) as draw:
 		# 	draw.text((0,0),"op1 connection success","white")
@@ -603,7 +559,7 @@ def loadTape(device,source):
 	keys={}
 	time.sleep(1)
 
-	if os.path.exists("/media/pi/OP1")==1:
+	if os.path.exists(op1path)==1:
 		
 		print "op1 connection success"
 		print "Backup Track?"
@@ -697,7 +653,7 @@ def loadUnloadSample(device,spath,name,op):
 	# term.println("  2-unload")
 	# term.println("  3-back")
 	# drawText([])
-	if os.path.exists("/media/pi/OP1")==1:
+	if os.path.exists(op1path)==1:
 		
 		print "op1 connection success"
 
@@ -709,8 +665,9 @@ def loadUnloadSample(device,spath,name,op):
 			if GPIO.event_detected(key['key2']):
 				print "copying"
 
-				dpath="/media/pi/OP1/synth/_" + str(name) + "/"
+				dpath=op1path+"/synth/_" + str(name) + "/"
 
+				
 				print spath,">",dpath
 						
 				if op=="load":
@@ -736,6 +693,73 @@ def loadUnloadSample(device,spath,name,op):
 		#term.println("  2-Menu")
 
 		wait(keys,'key1')
+
+def loadFirmware(device):
+	if os.path.exists("/media/pi/OP-1")==1:
+		drawText(device,["op1 connection success","load firmware?"," -yup"," -back"])
+		while True:
+			if GPIO.event_detected(key['key2']):
+				print "copying firmware"
+				drawText(device,["copying firmware..."])
+				spath="/home/pi/Desktop/misc/op1_225.op1"
+				dpath="/media/pi/OP-1/"
+				sh.copy(spath,dpath)
+				return
+
+
+			elif GPIO.event_detected(key['key1']):
+				return
+
+
+	else:
+		drawText(device,["op1 not detected","","returning to menu..."])
+		time.sleep(1)
+		return
+
+def scanTapes(device):
+	directory="/home/pi/Desktop/op1-tapebackups/"
+
+	print "updating tape index"
+	drawText(device,['updating tape index'])
+	#tapelist=[
+	# 	["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
+	# 	["recycling bin v2","/home/pi/Desktop/tapes/recycling bin v2"]
+	# 	]
+
+	for filename in os.listdir(directory):
+		print filename
+		fullPath = directory + filename
+		tapeList.append([filename,fullPath])
+	    #if filename.endswith(".atm") or filename.endswith(".py"): 
+
+
+	print tapeList
+
+def copytree(src, dst, symlinks=False, ignore=None):
+	ct=0
+	print str(len(os.listdir(src))) + " files to move"
+
+	try:
+		for item in os.listdir(src):
+			s = os.path.join(src, item)
+			print "source file: ", s
+			
+			d = os.path.join(dst, item)
+			if os.path.isdir(dst)==0:
+				print "destination doesn't exist. creating..."
+				os.mkdir(dst)
+			if os.path.isdir(s):
+				print "recurse!"
+				sh.copytree(s, d, symlinks, ignore)
+			else:
+				sh.copy(s, d)
+				ct+=1
+				print "file "+str(ct)+" moved"
+	except:
+		print "must be an error. file full or smt"
+
+
+# MAIN
 
 def main():
 	device=init()
