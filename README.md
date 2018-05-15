@@ -24,12 +24,11 @@
 
 **Future Features**
 - 'scene' load (samples, tape, and presets all at once)
-- name & update tapes (text input is going to be ugh.)
+- update tapes (text input is going to be ugh.)
 - aiff parser (theres some cool goodies in .aiff metadata)
 - count file capacity of op1 sampler/drum (how close are you to the magic 42?)
 - copy to external drive
 - google drive backup
-- midi chords
 - drum sample remove whitespace
 
 
@@ -39,8 +38,6 @@
 - update mounting code (ref https://github.com/tacoe/OP1GO/blob/master/op1go.py)
   - find op1 mount directory
 - low battery indicator
-- clean up, organize code
-- pc-independent
 - loading bar
 
 **Changelog**
