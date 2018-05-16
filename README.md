@@ -62,7 +62,10 @@
 - firmware upload (op1-225.op1) (reformat on the road when messy tapes corrupt your filesystem)
 - tapeMenu now autobuilds from a directory (no input checking, be careful!)
 
-5/15/2018:
+5/14/2018:
 - organized functions
 - readAif metadata scanner (get's cool aiff metadata. will use to discriminate synth&drum for sampleload. got the idea from [here](https://www.operator-1.com/index.php?p=/discussion/comment/8080/))
 - pulled out op1 mount path. want to make this extensible but it's one arg for now, tied to my device id.
+
+5/15/2018:
+- worked on scanSample.py, which recuses over nested directories and wrangles up sample packs. uses readAif to get sample metadata and sorts.
