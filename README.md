@@ -68,4 +68,4 @@
 - pulled out op1 mount path. want to make this extensible but it's one arg for now, tied to my device id.
 
 5/15/2018:
-- worked on scanSample.py, which recuses over nested directories and wrangles up sample packs. uses readAif to get sample metadata and sorts.
+- worked on scanSample.py, which recuses over nested directories and wrangles up sample packs. uses readAif to get sample metadata to sort into synth/drum.
