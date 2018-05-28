@@ -69,3 +69,7 @@
 
 5/15/2018:
 - worked on scanSample.py, which recuses over nested directories and wrangles up sample packs. uses readAif to get sample metadata to sort into synth/drum.
+
+5/28/2018:
+- added sample scanning. loops through sample directory and lists sample packs, categorizing them by synth, drum, or mixed
+- updated mount code to use pyusb (thanks https://github.com/tacoe/OP1GO/blob/master/op1go.py)
