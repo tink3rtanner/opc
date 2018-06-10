@@ -73,3 +73,9 @@
 5/28/2018:
 - added sample scanning. loops through sample directory and lists sample packs, categorizing them by synth, drum, or mixed
 - updated mount code to use pyusb (thanks https://github.com/tacoe/OP1GO/blob/master/op1go.py)
+
+6/10/2018:
+- fixed system wlan0 sometimes chopping off ip characters
+- updated tapeload and backuptape to have a nifty progress bar
+- updated tapeload and backuptape to new mounting code
+- added new system menu option to delete all synth folder
