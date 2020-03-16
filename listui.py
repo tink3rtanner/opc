@@ -11,7 +11,7 @@ from subprocess import *
 
 #KEYS
 key={}
-key['key1']=5 #broken on menona
+key['key1']=5 #physical key is broken on menona
 key['key2']=20
 key['key3']=16
 
