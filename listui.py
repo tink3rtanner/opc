@@ -102,7 +102,7 @@ def init():
 
 def initgpio():
 
-	print "Initializing GPIO"
+	print("Initializing GPIO")
 	#Initialize GPIO
 	GPIO.setmode(GPIO.BCM)
 	
@@ -175,13 +175,13 @@ def wait(keys,waitkey):
 def actionhandler(device,pos,apos,mname,draw=0):
 
 	#returning 1 escapes calling function to return
-	print 'action handler @',mname
-	print "pos: ",pos,"apos" ,apos
+	print('action handler @',mname)
+	print("pos: ",pos,"apos" ,apos)
 
 
 	if mname=="MAIN":
 		if pos==1 and apos==0:
-			print 'main: tape menu'
+			print('main: tape menu')
 			#MAIN MENU
 			tapeMenu(device)
 			return(1)
@@ -204,7 +204,7 @@ def actionhandler(device,pos,apos,mname,draw=0):
 
 			return(1)
 	elif mname=="MAIN>TAPES":
-		print "tape actions @POS: ",pos,", apos: ",apos	
+		print("tape actions @POS: ",pos,", apos: ",apos)	
 
 		if apos==1: #assuming pos is valid becasue menuList was built from tapeList
 			loadTape(device,tapeList[pos-1][1])
@@ -232,7 +232,7 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			loadUnloadSample(device,spath,dpath,sampleListDrum[pos-1][0],"delete")
 
 	elif mname=="MAIN>MIDI":
-		print "midi actions"
+		print("midi actions")
 		if pos==1:
 			midiSrc="14"
 			midiDst="20"
@@ -260,7 +260,7 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			ip=netstat.split('\n')[0]
 
 			print("wlan0 status")
-			print ip
+			print(ip)
 
 			drawText(device,["wlan0 status",ip])
 			wait({},"key3")
@@ -271,15 +271,15 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			return
 
 		elif pos==3:
-			print 'nestTest'
+			print('nestTest')
 			nestMenu(device)
 
 		elif pos==4:
-			print 'loading firmware'
+			print('loading firmware')
 			loadFirmware(device)
 
 		elif pos==5:
-			print 'testing progress'
+			print('testing progress')
 			drawProgress(device,"progress!",0)
 			time.sleep(2)
 			drawProgress(device,"progress!",.25)
@@ -292,7 +292,7 @@ def actionhandler(device,pos,apos,mname,draw=0):
 			time.sleep(2)
 
 		elif pos==6:
-			print 'deleting synth'
+			print('deleting synth')
 			dpath=op1path+"/synth/"
 			loadUnloadSample(device,"",dpath,"","delete")
 
@@ -308,7 +308,7 @@ def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 	#alist: action list
 	#mname: menu name for action context
 	title=mname
-	print mlist
+	print(mlist)
 
 	#key definition MOVE TO GLOBAL
 
@@ -320,7 +320,7 @@ def listMenuScroll(device,mlist,alist,mname,draw=0,actions=False,exit=True):
 	vmax=0
 
 	if len(mlist)>5:
-		print "long list"
+		print("long list")
 		
 		vmax=len(mlist)-5
 
@@ -510,7 +510,7 @@ def sampleMenuSynth(device):
 	#mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
 	mlist=[]
 	for item in sampleListSynth: #build menu list from sampleList global
-		print item
+		print(item)
 		mlist.append(item[0])
 
 	alist=["load", "unload","[empty]"]
@@ -520,7 +520,7 @@ def sampleMenuDrum(device):
 	#mlist=["josh", "courtyard","dawless","cmix","inkd","Dark Energy","memories","opines"]
 	mlist=[]
 	for item in sampleListDrum: #build menu list from sampleList global
-		print item
+		print(item)
 		mlist.append(item[0])
 
 	alist=["load", "unload","[empty]"]
@@ -576,7 +576,7 @@ def backupTape(device):
 		print(" > OP-1 device path: %s" % mountpath)
 		mountdevice(mountpath, MOUNT_DIR, 'ext4', 'rw')
 		print(" > Device mounted at %s" % MOUNT_DIR)
-	print is_connected()
+	print(is_connected())
 
 	if os.path.exists(op1path)==1:
 
@@ -593,10 +593,10 @@ def backupTape(device):
 			# draw.text((0,40),"Track 4 copied","white")
 
 
-		print "op1 connection success"
-		print "Backup Track?"
-		print "  1-back"
-		print "  2-continue"
+		print("op1 connection success")
+		print("Backup Track?")
+		print("  1-back")
+		print("  2-continue")
 
 
 
@@ -604,7 +604,7 @@ def backupTape(device):
 		#response loop
 		while True:
 			if GPIO.event_detected(key['key2']):
-				print "copying"
+				print("copying")
 				#draw.text((0,10),"copying","white")
 				#draw.text((0,20),"Backup tape?","white")
 				#Copy Operation
@@ -627,19 +627,19 @@ def backupTape(device):
 				drawProgress(device,"backing up tape...",0)
 
 				sh.copy(spath1,dpath)
-				print 'Track 1 Copied'
+				print('Track 1 Copied')
 				drawProgress(device,"backing up tape...",.2)
 
 				sh.copy(spath2,dpath)
-				print 'Track 2 Copied'
+				print('Track 2 Copied')
 				drawProgress(device,"backing up tape...",.4)
 
 				sh.copy(spath3,dpath)
-				print 'Track 3 Copied'
+				print('Track 3 Copied')
 				drawProgress(device,"backing up tape...",.6)
 
 				sh.copy(spath4,dpath)
-				print 'Track 4 Copied'
+				print('Track 4 Copied')
 				drawProgress(device,"backing up tape...",.8)
 
 				print(" > Unmounting OP-1")
@@ -653,9 +653,9 @@ def backupTape(device):
 			elif GPIO.event_detected(key['key1']):
 				return
 	else:
-		print "no op1 detcted"
-		print "Is your device connected and in disk mode?"
-		print "  1-Return to Menu"
+		print("no op1 detcted")
+		print("Is your device connected and in disk mode?")
+		print("  1-Return to Menu")
 		with canvas(device) as draw:
 			draw.text((0,10),"no op1 found","white")
 			draw.text((0,20),"1-return to menu","white")
@@ -674,15 +674,15 @@ def loadTape(device,source):
 		print(" > OP-1 device path: %s" % mountpath)
 		mountdevice(mountpath, MOUNT_DIR, 'ext4', 'rw')
 		print(" > Device mounted at %s" % MOUNT_DIR)
-	print is_connected()
+	print(is_connected())
 
 
 	if os.path.exists(op1path)==1:
 		
-		print "op1 connection success"
-		print "Backup Track?"
-		print "  1-Yes"
-		print "  2-No"
+		print("op1 connection success")
+		print("Backup Track?")
+		print("  1-Yes")
+		print("  2-No")
 
 		drawText(device,["op1 connection success","load tape?"," 1- back","2-yes"])
 
@@ -690,7 +690,7 @@ def loadTape(device,source):
 		#response loop
 		while True:
 			if GPIO.event_detected(key['key2']):
-				print "copying"
+				print("copying")
 
 
 				#Copy Operation
@@ -726,19 +726,19 @@ def loadTape(device,source):
 				drawProgress(device,'copying tape...',0)
 
 				sh.copy(spath1,dpath)
-				print 'Track 1 Copied'
+				print('Track 1 Copied')
 				drawProgress(device,'copying tape...',.2)
 
 				sh.copy(spath2,dpath)
-				print 'Track 2 Copied'
+				print('Track 2 Copied')
 				drawProgress(device,'copying tape...',.4)
 
 				sh.copy(spath3,dpath)
-				print 'Track 3 Copied'
+				print('Track 3 Copied')
 				drawProgress(device,'copying tape...',.6)
 
 				sh.copy(spath4,dpath)
-				print 'Track 4 Copied'
+				print('Track 4 Copied')
 				drawProgress(device,'copying tape...',.8)
 
 
@@ -752,9 +752,9 @@ def loadTape(device,source):
 			elif GPIO.event_detected(key['key1']):
 				return
 	else:
-		print "no op1 detcted"
-		print "Is your device connected and in disk mode?"
-		print "  1-Return to Menu"
+		print("no op1 detcted")
+		print("Is your device connected and in disk mode?")
+		print("  1-Return to Menu")
 
 		drawText(device,["no op1 found","1-return to menu"])
 		#term.println("  2-Menu")
@@ -783,7 +783,7 @@ def loadUnloadSample(device,spath,dpath,name,op):
 
 	if os.path.exists(op1path)==1:
 		
-		print "op1 connection success"
+		print("op1 connection success")
 
 
 		drawText(device,["op1 connection success","you sure?","1-back","2-yes"])
@@ -791,15 +791,15 @@ def loadUnloadSample(device,spath,dpath,name,op):
 
 		while True:
 			if GPIO.event_detected(key['key2']):
-				print "copying"
+				print("copying")
 
 				
 
 				
-				print spath,">",dpath
+				print(spath,">",dpath)
 						
 				if op=="load":
-					print "copying"
+					print("copying")
 					copytree(spath,dpath)
 					print(" > Unmounting OP-1")
 					unmountdevice(MOUNT_DIR)
@@ -809,7 +809,7 @@ def loadUnloadSample(device,spath,dpath,name,op):
 				elif op=="delete":
 					#sampleLoadMenu(term,keys)
 					sh.rmtree(dpath)
-					print name+' pack deleted'
+					print(name+' pack deleted')
 					print(" > Unmounting OP-1")
 					unmountdevice(MOUNT_DIR)
 					print(" > Done.")
@@ -819,9 +819,9 @@ def loadUnloadSample(device,spath,dpath,name,op):
 			elif GPIO.event_detected(key['key1']):
 				return
 	else:
-		print "no op1 detcted"
-		print "Is your device connected and in disk mode?"
-		print "  1-Return to Menu"
+		print("no op1 detcted")
+		print("Is your device connected and in disk mode?")
+		print("  1-Return to Menu")
 
 		drawText(device,["no op1 found","1-return to menu"])
 		#term.println("  2-Menu")
@@ -833,7 +833,7 @@ def loadFirmware(device):
 		drawText(device,["op1 connection success","load firmware?"," -yup"," -back"])
 		while True:
 			if GPIO.event_detected(key['key2']):
-				print "copying firmware"
+				print("copying firmware")
 				drawText(device,["copying firmware..."])
 				spath="/home/pi/Desktop/misc/op1_225.op1"
 				dpath="/media/pi/OP-1/"
@@ -852,10 +852,10 @@ def loadFirmware(device):
 
 def scanTapes(device):
 	#directory="/home/pi/Desktop/op1-tapebackups/"
-	directory=homedir+"/op1-tapebackups/"
+	directory=homedir+"/tapes/"
 
-	print
-	print "updating tape index"
+	print()
+	print("updating tape index")
 	
 	#tapelist=[
 	# 	["recycling bin v1","/home/pi/Desktop/tapes/recycling bin v1/tape"],
@@ -871,38 +871,38 @@ def scanTapes(device):
 			sampleListSynth.remove(['test','test'])
 	tapeList.sort()
 
-	print 
-	print "[TAPES]"
-	print tapeList
+	print()
+	print("[TAPES]")
+	print(tapeList)
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
 	ct=0
-	print str(len(os.listdir(src))) + " files to move"
+	print(str(len(os.listdir(src))) + " files to move")
 
 	try:
 		for item in os.listdir(src):
 			s = os.path.join(src, item)
-			print "source file: ", s
+			print("source file: ", s)
 			
 			d = os.path.join(dst, item)
 			if os.path.isdir(dst)==0:
-				print "destination doesn't exist. creating..."
+				print("destination doesn't exist. creating...")
 				os.mkdir(dst)
 			if os.path.isdir(s):
-				print "recurse!"
+				print("recurse!")
 				sh.copytree(s, d, symlinks, ignore)
 			else:
 				sh.copy(s, d)
 				ct+=1
-				print "file "+str(ct)+" moved"
+				print("file "+str(ct)+" moved")
 	except:
-		print "must be an error. file full or smt"
+		print("must be an error. file full or smt")
 
 def scanSamples(directory):
 	#scans sample packs in a path and updates sample lists
-	print
-	print "Scanning for samplepacks"
+	print()
+	print("Scanning for samplepacks")
 
 	directory="/home/pi/opc/samplepacks/"
 	for file in os.listdir(directory):
@@ -937,8 +937,8 @@ def scanSamples(directory):
 				elif subfile.endswith(".DS_Store"):
 					continue
 				else:
-					print "what's going on here. name your folders or hold it with the nesting"
-					print "SUBFILE: ",subfile
+					print("what's going on here. name your folders or hold it with the nesting")
+					print("SUBFILE: ",subfile)
 			if containsAif==1:
 				pack=readAifDir(file,fullPath)
 				if pack[2]["_types"]=='synth':
@@ -955,12 +955,12 @@ def scanSamples(directory):
 	if ['test', 'test'] in sampleListDrum: 
 		sampleListDrum.remove(['test','test'])
 
-	print
-	print "[SYNTH PACKS]"
-	print sampleListSynth
-	print
-	print "[DRUM PACKS]"
-	print sampleListDrum
+	print()
+	print("[SYNTH PACKS]")
+	print(sampleListSynth)
+	print()
+	print("[DRUM PACKS]")
+	print(sampleListDrum)
 
 
 	# for sample in sampleList:
@@ -990,7 +990,7 @@ def readAifDir(name,path):
 			#ignore .DS_Store mac files
 			continue
 		else:
-			print fullPath, " is not a aif. what gives?"
+			print(fullPath, " is not a aif. what gives?")
 	if ["a","a"] in aifsampleList:
 			aifsampleList.remove(["a","a"])
 
@@ -1222,3 +1222,4 @@ def main():
 
 
 main()
+
